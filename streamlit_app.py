@@ -45,7 +45,32 @@ if st.button("✨ Generate Modul Ajar"):
     else:
         with st.spinner("Sedang menyusun modul ajar yang lengkap..."):
             try:
-                model = genai.GenerativeModel(model_name='models/gemini-1.5-flash')
+                # Gunakan nama model tanpa prefix 'models/' atau coba versi pro jika flash bermasalah
+                # Kita coba 'gemini-1.5-flash-latest' yang biasanya lebih stabil untuk API v1
+                model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                
+                prompt_lengkap = f"""
+                Anda adalah pakar Kurikulum Merdeka Kemenag. 
+                Buat Modul Ajar lengkap untuk {jenjang}, Mapel: {mapel}, Topik: {topik}.
+                Sertakan Identitas, Profil Pelajar Pancasila & Rahmatan Lil Alamin, Tujuan, 
+                Langkah Pembelajaran Aktif, dan Asesmen.
+                """
+                
+                # Tambahkan sedikit konfigurasi pengamanan
+                response = model.generate_content(prompt_lengkap)
+                
+                st.success("Berhasil! Modul ajar Anda telah siap.")
+                st.markdown("---")
+                st.markdown(response.text)
+                
+            except Exception as e:
+                # Jika masih error 404, coba otomatis ganti ke model pro
+                try:
+                    model_alt = genai.GenerativeModel('gemini-1.5-pro')
+                    response = model_alt.generate_content(prompt_lengkap)
+                    st.markdown(response.text)
+                except:
+                    st.error(f"Terjadi kesalahan teknis: {e}")
 
                 
                 # Instruksi sistem yang sangat mendalam
