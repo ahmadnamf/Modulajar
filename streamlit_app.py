@@ -2,38 +2,66 @@ import streamlit as st
 import google.generativeai as genai
 
 # --- KONFIGURASI HALAMAN ---
-st.set_page_config(
-    page_title="AI Pembuat Modul Ajar Madrasah",
-    page_icon="📚",
-    layout="centered"
-)
+st.set_page_config(page_title="AI Modul Ajar Madrasah", page_icon="📚")
 
-# --- KONFIGURASI API KEY ---
-# Kode ini akan mengambil API Key dari menu "Secrets" di Streamlit agar aman
+# --- KONFIGURASI API ---
 try:
-    API_KEY = st.secrets["API_KEY"]
-    genai.configure(api_key=API_KEY)
+    # Mengambil API_KEY dari Secrets Streamlit
+    KEY_NYA = st.secrets["API_KEY"]
+    genai.configure(api_key=KEY_NYA)
 except:
-    st.error("API Key tidak ditemukan! Pastikan Anda sudah memasukkannya di menu Settings > Secrets di Streamlit.")
+    st.error("API Key belum terpasang di Secrets Streamlit!")
     st.stop()
 
-# --- TAMPILAN ANTARMUKA ---
+# --- TAMPILAN ---
 st.title("📚 Penyusun Modul Ajar Madrasah")
-st.write("Alat bantu AI untuk guru MTs & MA menyusun Modul Ajar Kurikulum Merdeka.")
+st.write("Gunakan AI untuk menyusun Modul Ajar Kurikulum Merdeka.")
 
-with st.expander("ℹ️ Cara Penggunaan"):
-    st.write("""
-    1. Pilih Jenjang (MTs atau MA).
-    2. Masukkan Mata Pelajaran.
-    3. Masukkan Topik atau Bab yang ingin dibuatkan modunyal.
-    4. Klik 'Generate Modul Ajar' dan tunggu AI bekerja.
-    """)
+jenjang = st.selectbox("Pilih Jenjang:", ["MTs (Fase D)", "MA (Fase E)", "MA (Fase F)"])
+mapel = st.text_input("Mata Pelajaran:")
+topik = st.text_area("Topik Materi / Judul Bab:")
 
-# --- INPUT FORM ---
-col1, col2 = st.columns(2)
-with col1:
-    jenjang = st.selectbox("Pilih Jenjang:", ["MTs (Fase D)", "MA (Fase E)", "MA (Fase F)"])
-with col2:
+if st.button("✨ Generate Modul Ajar"):
+    if not mapel or not topik:
+        st.warning("Isi dulu Mapel dan Topiknya ya.")
+    else:
+        with st.spinner("Sedang mencari model AI yang tersedia..."):
+            try:
+                # LANGKAH ANTI-ERROR 404: Mencari model yang aktif di akun kamu
+                model_list = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                
+                # Memilih model terbaik yang tersedia (Flash atau Pro)
+                nama_model = ""
+                if 'models/gemini-1.5-flash' in model_list:
+                    nama_model = 'models/gemini-1.5-flash'
+                elif 'models/gemini-1.5-pro' in model_list:
+                    nama_model = 'models/gemini-1.5-pro'
+                else:
+                    nama_model = model_list[0] # Pakai apa saja yang tersedia
+
+                model = genai.GenerativeModel(nama_model)
+                
+                prompt = f"""
+                Buatkan Modul Ajar Kurikulum Merdeka untuk {jenjang}.
+                Mata Pelajaran: {mapel}
+                Topik: {topik}
+                
+                Struktur: Identitas, Profil Pelajar Pancasila & Rahmatan Lil Alamin, 
+                Tujuan Pembelajaran, Langkah-langkah Kegiatan, dan Asesmen.
+                Gunakan Bahasa Indonesia yang baik.
+                """
+                
+                response = model.generate_content(prompt)
+                
+                st.success(f"Berhasil menggunakan {nama_model}")
+                st.markdown("---")
+                st.markdown(response.text)
+                
+            except Exception as e:
+                st.error(f"Maaf, ada kendala teknis: {e}")
+
+st.markdown("---")
+st.caption("Dibuat untuk Guru Madrasah Indonesia")
     mapel = st.text_input("Mata Pelajaran:", placeholder="Contoh: Fikih, Biologi, Ekonomi")
 
 topik = st.text_area("Topik Materi / Judul Bab:", placeholder="Contoh: Shalat Jamak dan Qashar, Sel, atau Permintaan dan Penawaran")
