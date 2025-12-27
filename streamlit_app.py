@@ -45,7 +45,8 @@ if st.button("✨ Generate Modul Ajar"):
     else:
         with st.spinner("Sedang menyusun modul ajar yang lengkap..."):
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel(model_name='models/gemini-1.5-flash')
+
                 
                 # Instruksi sistem yang sangat mendalam
                 prompt_lengkap = f"""
