@@ -11,7 +11,7 @@ st.set_page_config(
 # --- KONFIGURASI API KEY ---
 # Kode ini akan mengambil API Key dari menu "Secrets" di Streamlit agar aman
 try:
-    API_KEY = st.secrets[AIzaSyCgg2KNuYCaIXq2Pnwuhe-MZY6g5ncSYlo]
+    API_KEY = st.secrets["AIzaSyCgg2KNuYCaIXq2Pnwuhe-MZY6g5ncSYlo"]
     genai.configure(api_key=API_KEY)
 except:
     st.error("API Key tidak ditemukan! Pastikan Anda sudah memasukkannya di menu Settings > Secrets di Streamlit.")
