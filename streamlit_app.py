@@ -69,28 +69,42 @@ if generate_btn:
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# --- AREA CANVAS (EDITING) ---
+# --- AREA HASIL & PREVIEW (CANVAS) ---
 if st.session_state.hasil_modul:
     st.markdown("---")
-    st.subheader("📝 Edit Modul Ajar")
-    st.info("Silakan edit teks di bawah ini jika ada yang ingin disesuaikan.")
     
-    # Area Edit (Canvas)
-    teks_edit = st.text_area("Konten Modul:", value=st.session_state.hasil_modul, height=500)
+    # Tab untuk memisahkan mode Lihat (Rapi) dan mode Edit (Teks Mentah)
+    tab1, tab2 = st.tabs(["👀 Lihat Hasil (Rapi)", "✍️ Edit Teks"])
     
-    # Tombol Aksi di bawah Canvas
+    with tab1:
+        st.success("✅ Modul berhasil disusun! Berikut tampilannya:")
+        # Menampilkan hasil yang rapi (tanpa simbol Markdown terlihat)
+        st.markdown(st.session_state.hasil_modul)
+        st.info("💡 **Tips Copas ke Word:** Blok dan pilih teks di atas, lalu Copy (Ctrl+C) dan Paste (Ctrl+V) di Microsoft Word. Format judul, tebal, dan tabel akan otomatis ikut dengan rapi.")
+
+    with tab2:
+        st.write("Silakan edit teks di bawah ini jika ada bagian yang ingin disesuaikan:")
+        # Area Edit menggunakan text_area
+        st.session_state.hasil_modul = st.text_area(
+            "Editor Konten:", 
+            value=st.session_state.hasil_modul, 
+            height=500
+        )
+    
+    # Tombol Aksi di bawah Tab
     col1, col2 = st.columns(2)
     with col1:
         st.download_button(
-            label="📥 Download Hasil Edit (.txt)",
-            data=teks_edit,
-            file_name=f"Modul_{mapel}_{topik}.txt",
-            mime="text/plain",
+            label="📥 Download File (.txt)",
+            data=st.session_state.hasil_modul,
+            file_name=f"Modul_Ajar_{mapel}.txt",
+            mime="text/plain"
         )
     with col2:
-        st.write("💡 *Gunakan Ctrl+A & Ctrl+C untuk copy semua teks.*")
-else:
-    st.info("Silakan isi data di sebelah kiri dan klik 'Generate' untuk memulai.")
+        if st.button("🗑️ Hapus & Buat Baru"):
+            st.session_state.hasil_modul = ""
+            st.rerun()
 
+# Penutup footer aplikasi
 st.markdown("---")
-st.caption("Aplikasi Modul Ajar Madrasah Berbasis AI")
+st.caption("Aplikasi Modul Ajar Madrasah - Update Regulasi 2025/2026")
