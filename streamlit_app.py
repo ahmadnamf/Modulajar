@@ -39,8 +39,31 @@ if generate_btn:
                 nama_model = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in model_list else model_list[0]
                 model = genai.GenerativeModel(nama_model)
                 
-                prompt = f"Buatkan Modul Ajar Kurikulum Merdeka untuk {jenjang}. Mapel: {mapel}. Topik: {topik}. Lengkap dengan Identitas, Profil Pelajar Pancasila & Rahmatan Lil Alamin, Tujuan, Langkah Kegiatan, dan Asesmen."
-                
+                prompt = f"""
+                Anda adalah pakar kurikulum nasional yang menguasai regulasi pendidikan terbaru tahun 2025/2026.
+                Tugas Anda adalah menyusun Modul Ajar Kurikulum Merdeka yang SEPENUHNYA PATUH pada:
+                1. Permendikdasmen No. 13 Tahun 2025 (Standar Kurikulum Nasional Terbaru).
+                2. KMA No. 1503 Tahun 2025 (Pedoman Implementasi Kurikulum pada Madrasah).
+
+                DATA MODUL:
+                - Jenjang: {jenjang}
+                - Mata Pelajaran: {mapel}
+                - Topik: {topik}
+
+                KOMPONEN WAJIB SESUAI REGULASI TERBARU (2025/2026):
+                A. IDENTITAS MODUL: (Fase, Kelas, Alokasi Waktu).
+                B. TUJUAN PEMBELAJARAN: (Berbasis kompetensi esensial).
+                C. PROFIL PELAJAR:
+                   - Profil Pelajar Pancasila (P3).
+                   - Profil Pelajar Rahmatan Lil Alamin (P2RA) dengan sub-nilai relevan sesuai KMA 1503/2025.
+                D. LANGKAH PEMBELAJARAN: (Berdiferensiasi, aktif, dan inovatif).
+                E. ASESMEN: (Diagnostik/Awal, Formatif, dan Sumatif).
+                F. MEDIA & SUMBER BELAJAR: (Termasuk integrasi literasi digital).
+
+                INSTRUKSI KHUSUS:
+                - Pastikan integrasi nilai moderasi beragama dan adab muncul secara eksplisit dalam langkah pembelajaran sesuai spirit KMA 1503/2025.
+                - Gunakan format Markdown yang rapi (Heading, List, dan Tabel).
+                """
                 response = model.generate_content(prompt)
                 st.session_state.hasil_modul = response.text
             except Exception as e:
